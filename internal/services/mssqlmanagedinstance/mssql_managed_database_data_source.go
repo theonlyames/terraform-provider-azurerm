@@ -174,12 +174,9 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 				return fmt.Errorf("retrieving Short Term Retention Policy for  %s: %v", id, err)
 			}
 
-			if shortTermRetentionResp.RetentionDays != nil {
-				model.ShortTermRetentionDays = int64(*shortTermRetentionResp.RetentionDays)
-			}
-
-			d := metadata.ResourceData
-			if v, ok := d.GetOk("point_in_time_restore"); ok {
+			model.ShortTermRetentionDays = int64(pointer.From(shortTermRetentionResp.RetentionDays))
+			
+			if v, ok := metadata.ResourceData.GetOk("point_in_time_restore"); ok {  
 				model.PointInTimeRestore = flattenManagedDatabasePointInTimeRestore(v)
 			}
 
