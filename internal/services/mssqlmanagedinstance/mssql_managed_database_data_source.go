@@ -53,18 +53,22 @@ func (d MsSqlManagedDatabaseDataSource) Arguments() map[string]*pluginsdk.Schema
 			ForceNew:     true,
 			ValidateFunc: validate.ValidateMsSqlManagedInstanceDatabaseName,
 		},
-		"managed_instance_name": {
+		"managed_instance_id": {
 			Type:         schema.TypeString,
 			Required:     true,
-			ValidateFunc: miValidate.ValidateMsSqlServerName,
+			ForceNew: 		true,		
+			ValidateFunc: validate.ManagedInstanceID,
 		},
-		"resource_group_name": commonschema.ResourceGroupNameForDataSource(),
 	}
 }
 
 func (d MsSqlManagedDatabaseDataSource) Attributes() map[string]*pluginsdk.Schema {
 	return map[string]*pluginsdk.Schema{
-		"managed_instance_id": {
+		"managed_instance_name": {
+			Type:     pluginsdk.TypeString,
+			Computed: true,
+		},
+		"resource_group_name": {
 			Type:     pluginsdk.TypeString,
 			Computed: true,
 		},
@@ -135,7 +139,11 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 				return fmt.Errorf("decoding: %+v)", err)
 			}
 
-			managedInstanceId := parse.NewManagedInstanceID(subscriptionId, state.ResourceGroupName, state.ManagedInstanceName)
+			managedInstanceId, err := parse.ManagedInstanceID(state.ManagedInstanceId)
+			if err != nil {  
+				return err  
+		  }  
+
 			id := parse.NewManagedDatabaseID(subscriptionId, managedInstanceId.ResourceGroup, managedInstanceId.Name, state.Name)
 			resp, err := client.Get(ctx, id.ResourceGroup, id.ManagedInstanceName, id.DatabaseName)
 			if err != nil {
@@ -149,9 +157,10 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 				Name:                id.DatabaseName,
 				ManagedInstanceName: managedInstanceId.Name,
 				ResourceGroupName:   id.ResourceGroup,
+				ManagedInstanceId: 	 managedInstanceId.ID(),
 			}
 
-			model.ManagedInstanceId = managedInstanceId.ID()
+			
 
 			ltrResp, err := longTermRetentionClient.Get(ctx, id.ResourceGroup, id.ManagedInstanceName, id.DatabaseName)
 			if err != nil {
