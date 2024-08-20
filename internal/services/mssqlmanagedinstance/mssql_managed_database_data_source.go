@@ -80,34 +80,29 @@ func (d MsSqlManagedDatabaseDataSource) Attributes() map[string]*pluginsdk.Schem
 					// WeeklyRetention - The weekly retention policy for an LTR backup in an ISO 8601 format.
 					"weekly_retention": {
 						Type:     pluginsdk.TypeString,
-						Optional: true,
 						Computed: true,
 					},
 
 					// MonthlyRetention - The monthly retention policy for an LTR backup in an ISO 8601 format.
 					"monthly_retention": {
 						Type:     pluginsdk.TypeString,
-						Optional: true,
 						Computed: true,
 					},
 
 					// YearlyRetention - The yearly retention policy for an LTR backup in an ISO 8601 format.
 					"yearly_retention": {
 						Type:     pluginsdk.TypeString,
-						Optional: true,
 						Computed: true,
 					},
 
 					// WeekOfYear - The week of year to take the yearly backup in an ISO 8601 format.
 					"week_of_year": {
 						Type:     pluginsdk.TypeInt,
-						Optional: true,
 						Computed: true,
 					},
 
 					"immutable_backups_enabled": {
 						Type:     pluginsdk.TypeBool,
-						Optional: true,
 						Computed: true,
 					},
 				},
@@ -121,6 +116,18 @@ func (d MsSqlManagedDatabaseDataSource) Attributes() map[string]*pluginsdk.Schem
 		"point_in_time_restore": {
 			Type:     schema.TypeList,
 			Computed: true,
+			Elem: &pluginsdk.Resource{
+				Schema: map[string]*pluginsdk.Schema{
+					"restore_point_in_time": {
+						Type:     pluginsdk.TypeString,
+						Computed: true,
+					},
+					"source_database_id": {
+						Type:     schema.TypeString,
+						Computed: true,
+					},
+				},
+			},
 		},
 	}
 }
