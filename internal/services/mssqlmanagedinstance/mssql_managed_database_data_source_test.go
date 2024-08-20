@@ -20,7 +20,7 @@ func TestAccDataSourceMsSqlManagedDatabase_basic(t *testing.T) {
 		{
 			Config: MsSqlManagedDatabaseDataSource{}.basic(data),
 			Check: acceptance.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Key("name").Exists(),				
+				check.That(data.ResourceName).Key("name").Exists(),
 				check.That(data.ResourceName).Key("managed_instance_id").Exists(),
 			),
 		},

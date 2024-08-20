@@ -13,10 +13,10 @@ import (
 	"github.com/hashicorp/go-azure-helpers/lang/pointer"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-provider-azurerm/internal/sdk"
-	"github.com/hashicorp/terraform-provider-azurerm/utils"
 	"github.com/hashicorp/terraform-provider-azurerm/internal/services/mssqlmanagedinstance/validate"
 	"github.com/hashicorp/terraform-provider-azurerm/internal/services/sql/parse"
 	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
+	"github.com/hashicorp/terraform-provider-azurerm/utils"
 )
 
 type MsSqlManagedDatabaseDataSourceModel struct {
@@ -56,7 +56,7 @@ func (d MsSqlManagedDatabaseDataSource) Arguments() map[string]*pluginsdk.Schema
 		"managed_instance_id": {
 			Type:         schema.TypeString,
 			Required:     true,
-			ForceNew: 		true,		
+			ForceNew:     true,
 			ValidateFunc: validate.ManagedInstanceID,
 		},
 	}
@@ -140,9 +140,9 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 			}
 
 			managedInstanceId, err := parse.ManagedInstanceID(state.ManagedInstanceId)
-			if err != nil {  
-				return err  
-		  }  
+			if err != nil {
+				return err
+			}
 
 			id := parse.NewManagedDatabaseID(subscriptionId, managedInstanceId.ResourceGroup, managedInstanceId.Name, state.Name)
 			resp, err := client.Get(ctx, id.ResourceGroup, id.ManagedInstanceName, id.DatabaseName)
@@ -157,10 +157,8 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 				Name:                id.DatabaseName,
 				ManagedInstanceName: managedInstanceId.Name,
 				ResourceGroupName:   id.ResourceGroup,
-				ManagedInstanceId: 	 managedInstanceId.ID(),
+				ManagedInstanceId:   managedInstanceId.ID(),
 			}
-
-			
 
 			ltrResp, err := longTermRetentionClient.Get(ctx, id.ResourceGroup, id.ManagedInstanceName, id.DatabaseName)
 			if err != nil {
@@ -175,8 +173,8 @@ func (d MsSqlManagedDatabaseDataSource) Read() sdk.ResourceFunc {
 			}
 
 			model.ShortTermRetentionDays = int64(pointer.From(shortTermRetentionResp.RetentionDays))
-			
-			if v, ok := metadata.ResourceData.GetOk("point_in_time_restore"); ok {  
+
+			if v, ok := metadata.ResourceData.GetOk("point_in_time_restore"); ok {
 				model.PointInTimeRestore = flattenManagedDatabasePointInTimeRestore(v)
 			}
 
